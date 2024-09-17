@@ -14,7 +14,7 @@
     <a th:href="@{/relatorio/pdf/jr1(code='01', acao='d')}">Download</a>
 
     <hr>
-    
+
     <div>
         <h2>Relatório 09</h2>
         <form th:action="@{/relatorio/pdf/jr9/09}" method="get">
@@ -30,6 +30,14 @@
 
             <button type="submit">Buscar</button>
         </form>
+    </div>
+
+    <hr>
+
+    <div>
+        <h2>Relatório 10</h2>
+        <a th:href="@{/relatorio/pdf/jr1(code='10', acao='v')}">Abrir</a>
+        <a th:href="@{/relatorio/pdf/jr1(code='10', acao='d')}">Download</a>
     </div>
 </body>
 </html>

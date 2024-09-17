@@ -27,6 +27,7 @@ public class JasperService {
 
     public JasperService() {
         this.params.put("IMAGEM_DIRETORIO", JASPER_DIRETORIO);
+        this.params.put("SUB_REPORT_DIR", JASPER_DIRETORIO);
     }
 
     public void addParam(String key, Object value) {
