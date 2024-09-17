@@ -7,7 +7,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
 </head>
 <body>
-    <h1>Bem vindo ao curso!!!</h1>
-    <a th:href="@{/reports}">Visualizar relatórios</a>
+    <h1>Relatórios</h1>
+
+    <h2>Relatório 01</h2>
+    <a th:href="@{/relatorio/pdf/jr1(code='01', acao='v'))}">Abrir</a>
+    <a th:href="@{/relatorio/pdf/jr1(code='01', acao='d'))}">Download</a>
 </body>
 </html>
