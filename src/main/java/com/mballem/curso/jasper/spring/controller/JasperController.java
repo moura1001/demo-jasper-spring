@@ -1,6 +1,7 @@
 package com.mballem.curso.jasper.spring.controller;
 
 import com.mballem.curso.jasper.spring.repository.EnderecoRepository;
+import com.mballem.curso.jasper.spring.repository.FuncionarioRepository;
 import com.mballem.curso.jasper.spring.repository.NivelRepository;
 import com.mballem.curso.jasper.spring.service.JasperService;
 import jakarta.servlet.http.HttpServletResponse;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.ModelAndView;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,6 +28,9 @@ public class JasperController {
 
     @Autowired
     private EnderecoRepository enderecoRepository;
+
+    @Autowired
+    private FuncionarioRepository funcionarioRepository;
 
     @GetMapping("/reports")
     public String paginaRelatorios() {
@@ -58,6 +63,23 @@ public class JasperController {
         response.setContentType(MediaType.APPLICATION_PDF_VALUE);
         response.setHeader("Content-disposition", "inline; filename=relatorio-"+code+".pdf");
         response.getOutputStream().write(bytes);
+    }
+
+    @GetMapping("/relatorio/pdf/jr19/{code}")
+    public void exibirRelatorio19(@PathVariable("code") String code,
+                                  @RequestParam(name = "idf", required = false) Long id,
+                                  HttpServletResponse response) throws IOException {
+        service.addParam("ID_FUNCIONARIO", id);
+
+        byte[] bytes = service.exportarPdf(code);
+        response.setContentType(MediaType.APPLICATION_PDF_VALUE);
+        response.setHeader("Content-disposition", "inline; filename=relatorio-"+code+".pdf");
+        response.getOutputStream().write(bytes);
+    }
+
+    @GetMapping("/buscar/funcionarios")
+    public ModelAndView buscarFuncionariosPorNome(@RequestParam("nome") String nome) {
+        return new ModelAndView("reports", "funcionarios", funcionarioRepository.findFuncionariosByNome(nome));
     }
 
     @ModelAttribute("niveis")

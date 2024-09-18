@@ -39,5 +39,32 @@
         <a th:href="@{/relatorio/pdf/jr1(code='10', acao='v')}">Abrir</a>
         <a th:href="@{/relatorio/pdf/jr1(code='10', acao='d')}">Download</a>
     </div>
+
+    <hr>
+
+    <div>
+        <h2>Relatório 19</h2>
+        <form th:action="@{/buscar/funcionarios}" method="get">
+            <input type="text" id="nome" name="nome" placeholder="Nome do funcionário">
+            <button type="submit">Buscar</button>
+        </form>
+
+        <br>
+
+        <table>
+            <thead>
+                <th>Nome do funcionário</th>
+                <th>Emitir certificado</th>
+            </thead>
+            <tbody>
+                <tr th:each="f : ${funcionarios}">
+                    <td th:text="f.get('nome')"></td>
+                    <td>
+                        <a th:href="@{/relatorio/pdf/jr19/19(idf=${f.get('id')})}">Certificado</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>
