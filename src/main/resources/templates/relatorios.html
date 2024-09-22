@@ -60,7 +60,9 @@
                 <tr th:each="f : ${funcionarios}">
                     <td th:text="f.get('nome')"></td>
                     <td>
-                        <a th:href="@{/relatorio/pdf/jr19/19(idf=${f.get('id')})}">Certificado</a>
+                        <a th:href="@{/relatorio/pdf/jr19/19(idf=${f.get('id')})}">PDF</a>
+                        |
+                        <a th:href="@{/relatorio/html/jr19/19(idf=${f.get('id')})}">HTML</a>
                     </td>
                 </tr>
             </tbody>

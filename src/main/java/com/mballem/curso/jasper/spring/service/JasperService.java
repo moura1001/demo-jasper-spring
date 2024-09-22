@@ -1,15 +1,24 @@
 package com.mballem.curso.jasper.spring.service;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.export.HtmlExporter;
+import net.sf.jasperreports.engine.export.HtmlResourceHandler;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleHtmlExporterOutput;
+import net.sf.jasperreports.j2ee.servlets.ImageServlet;
+import net.sf.jasperreports.web.util.WebHtmlResourceHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
@@ -46,5 +55,34 @@ public class JasperService {
             throw new RuntimeException(e);
         }
         return bytes;
+    }
+
+    public HtmlExporter exportarHtml(String code, HttpServletRequest request, HttpServletResponse response) {
+        HtmlExporter htmlExporter = null;
+
+        try {
+            File file = ResourceUtils.getFile(JASPER_DIRETORIO.concat(JASPER_PREFIXO).concat(code).concat(JASPER_SUFIXO));
+            JasperPrint print = JasperFillManager.fillReport(file.getAbsolutePath(), params, connection);
+            htmlExporter = new HtmlExporter();
+            htmlExporter.setExporterInput(new SimpleExporterInput(print));
+
+            SimpleHtmlExporterOutput htmlExporterOutput = new SimpleHtmlExporterOutput(response.getWriter());
+            HtmlResourceHandler resourceHandler = new WebHtmlResourceHandler(
+                    request.getContextPath()+"/image/servlet?image={0}"
+            );
+            htmlExporterOutput.setImageHandler(resourceHandler);
+            htmlExporter.setExporterOutput(htmlExporterOutput);
+
+            request.getSession().setAttribute(ImageServlet.DEFAULT_JASPER_PRINT_SESSION_ATTRIBUTE, print);
+
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (JRException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        return htmlExporter;
     }
 }
