@@ -13,12 +13,14 @@ import net.sf.jasperreports.export.SimpleHtmlExporterOutput;
 import net.sf.jasperreports.j2ee.servlets.ImageServlet;
 import net.sf.jasperreports.web.util.WebHtmlResourceHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ResourceUtils;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.util.HashMap;
 import java.util.Map;
@@ -31,6 +33,9 @@ public class JasperService {
 
     @Autowired
     private Connection connection;
+
+    @Autowired
+    private ResourceLoader resourceLoader;
 
     private Map<String, Object> params = new HashMap<>();
 
@@ -46,10 +51,11 @@ public class JasperService {
     public byte[] exportarPdf(String code) {
         byte[] bytes = null;
         try {
-            File file = ResourceUtils.getFile(JASPER_DIRETORIO.concat(JASPER_PREFIXO).concat(code).concat(JASPER_SUFIXO));
-            JasperPrint print = JasperFillManager.fillReport(file.getAbsolutePath(), params, connection);
+            Resource resource = resourceLoader.getResource(JASPER_DIRETORIO.concat(JASPER_PREFIXO).concat(code).concat(JASPER_SUFIXO));
+            InputStream stream = resource.getInputStream();
+            JasperPrint print = JasperFillManager.fillReport(stream, params, connection);
             bytes = JasperExportManager.exportReportToPdf(print);
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         } catch (JRException e) {
             throw new RuntimeException(e);
@@ -61,8 +67,9 @@ public class JasperService {
         HtmlExporter htmlExporter = null;
 
         try {
-            File file = ResourceUtils.getFile(JASPER_DIRETORIO.concat(JASPER_PREFIXO).concat(code).concat(JASPER_SUFIXO));
-            JasperPrint print = JasperFillManager.fillReport(file.getAbsolutePath(), params, connection);
+            Resource resource = resourceLoader.getResource(JASPER_DIRETORIO.concat(JASPER_PREFIXO).concat(code).concat(JASPER_SUFIXO));
+            InputStream stream = resource.getInputStream();
+            JasperPrint print = JasperFillManager.fillReport(stream, params, connection);
             htmlExporter = new HtmlExporter();
             htmlExporter.setExporterInput(new SimpleExporterInput(print));
 
@@ -75,8 +82,6 @@ public class JasperService {
 
             request.getSession().setAttribute(ImageServlet.DEFAULT_JASPER_PRINT_SESSION_ATTRIBUTE, print);
 
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
         } catch (JRException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
